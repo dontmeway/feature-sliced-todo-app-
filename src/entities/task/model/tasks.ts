@@ -8,6 +8,10 @@ const getTasksListFx = createEffect((params?: typicodeApi.tasks.GetTasksListPara
     return typicodeApi.tasks.getTasksList(params)
 })
 
+const getTaskByIdFx = createEffect((params: typicodeApi.tasks.GetTaskByIdParams) => {
+    return typicodeApi.tasks.getTaskById(params)
+})
+
 export const taskSchema = new schema.Entity('tasks')
 export const normalizeTask = (data: Task) => normalize(data, taskSchema)
 export const normalizeTasks = (data: Task[]) => normalize(data, [taskSchema])
@@ -23,6 +27,10 @@ const toggleTask = createEvent<number>()
 export const tasksInitialState: Record<number, Task> = {}
 export const $tasks = createStore(tasksInitialState)
     .on(getTasksListFx.doneData, (_, payload) => normalizeTasks(payload.data).entities.tasks)
+    .on(getTaskByIdFx.doneData, (state, payload) => ({
+        ...state,
+        ...normalizeTask(payload.data).entities.tasks
+    }))
     .on(toggleTask, (state, taskId) => {
         const task = state[taskId]
         return {
@@ -40,6 +48,8 @@ export const $queryConfig = createStore<QueryConfig>({})
     .on(setQueryConfig, (_, payload) => payload)
 
 export const $tasksListLoading = getTasksListFx.pending
+export const $taskDetailsLoading = getTaskByIdFx.pending
+
 export const $tasksListEmpty = $tasksList.map((tasks) => tasks.length === 0)
 
 export const $tasksFiltered = combine(
@@ -64,7 +74,8 @@ export const events = {
 }
 
 export const effects = {
-    getTasksListFx
+    getTasksListFx,
+    getTaskByIdFx
 }
 
 export const selectors = {

@@ -1,7 +1,7 @@
 import { reflect } from "@effector/reflect";
 import { Radio } from "antd";
 import { taskModel } from "entities/task";
-import { filtersList, getFilterById } from "./config";
+import { DEFAULT_FILTER, filtersList, getFilterById } from "./config";
 
 type Props = {
   loading: boolean;
@@ -10,7 +10,7 @@ type Props = {
 
 const View = ({ loading, onFilterClick }: Props) => {
   return (
-    <Radio.Group buttonStyle="solid">
+    <Radio.Group defaultValue={DEFAULT_FILTER} buttonStyle="solid">
       {filtersList.map(({ title, id }) => (
         <Radio.Button
           key={id}
